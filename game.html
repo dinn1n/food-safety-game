@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>遊戲開始</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>🍱 食安問答</h1>
+  <div id="questionBox">題目載入中...</div>
+  <div id="optionsBox"></div>
+  <p>目前分數：<span id="score">0</span></p>
+  <button id="nextBtn" style="display:none;">下一題</button>
+  <button id="submitBtn" style="display:none;">提交分數</button>
+
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="game.js"></script>
+</body>
+</html>
