@@ -2,7 +2,8 @@ import { auth, db } from "./firebase-config.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const questions = [
+// 題庫：共 6 題
+const questionBank = [
   {
     question: "哪個需要冷藏？",
     options: ["餅乾", "牛奶", "糖果", "洋芋片"],
@@ -14,40 +15,52 @@ const questions = [
     answer: 0
   },
   {
-    question: "食品過期了該怎麼辦？",
-    options: ["聞聞看", "加熱後吃", "丟掉", "吃一口試試"],
-    answer: 2
-  },
-  {
-    question: "生熟食應如何放置？",
-    options: ["放一起省空間", "熟食放上層，生食放下層", "沒差", "生食放上層"],
-    answer: 1
-  },
-  {
-    question: "何種包裝方式可延長保存？",
-    options: ["真空包裝", "裸裝", "鋁箔包", "塑膠袋"],
+    question: "生食應注意什麼？",
+    options: ["新鮮度", "大小", "顏色", "包裝"],
     answer: 0
   },
   {
-    question: "下列哪個不是食物中毒原因？",
-    options: ["食物未煮熟", "吃太多", "交叉污染", "保存不當"],
+    question: "過期食品應該？",
+    options: ["繼續吃", "丟棄", "煮熟就好", "給別人"],
     answer: 1
+  },
+  {
+    question: "什麼不是食安標章？",
+    options: ["HACCP", "GMP", "ISO", "UPS"],
+    answer: 3
+  },
+  {
+    question: "開封後牛奶要在幾天內喝完？",
+    options: ["7 天", "1 天", "3 天", "10 天"],
+    answer: 2
   }
 ];
 
+// 隨機選 4 題
+function getRandomQuestions(arr, n) {
+  const shuffled = arr.sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, n);
+}
+
+let questions = getRandomQuestions(questionBank, 4);
 let current = 0;
 let score = 0;
 let user = null;
 
+// DOM 元素
 const qBox = document.getElementById("questionBox");
 const oBox = document.getElementById("optionsBox");
 const scoreSpan = document.getElementById("score");
 const nextBtn = document.getElementById("nextBtn");
 const submitBtn = document.getElementById("submitBtn");
 
+// 音效
+const correctAudio = new Audio("correct.mp3");
+
+// 顯示題目
 function showQuestion() {
   const q = questions[current];
-  qBox.textContent = q.question;
+  qBox.textContent = `第 ${current + 1} 題：${q.question}`;
   oBox.innerHTML = "";
 
   q.options.forEach((opt, i) => {
@@ -55,17 +68,20 @@ function showQuestion() {
     btn.textContent = opt;
     btn.onclick = () => {
       if (i === q.answer) {
-        alert("答對了！");
         score++;
         scoreSpan.textContent = score;
+        correctAudio.play();
+        btn.classList.add("correct-flash");
       } else {
         alert("答錯了！");
       }
-      nextBtn.style.display = "inline";
+
       Array.from(oBox.children).forEach(b => b.disabled = true);
+      nextBtn.style.display = "inline";
     };
     oBox.appendChild(btn);
   });
+
   nextBtn.style.display = "none";
 }
 
@@ -74,10 +90,10 @@ nextBtn.onclick = () => {
   if (current < questions.length) {
     showQuestion();
   } else {
-    nextBtn.style.display = "none";
-    submitBtn.style.display = "inline";
     qBox.textContent = "🎉 遊戲完成！請提交分數";
     oBox.innerHTML = "";
+    nextBtn.style.display = "none";
+    submitBtn.style.display = "inline";
   }
 };
 
@@ -95,6 +111,7 @@ submitBtn.onclick = async () => {
   }
 };
 
+// 登入狀態監聽
 onAuthStateChanged(auth, (u) => {
   if (u) {
     user = u;
