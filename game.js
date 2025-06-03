@@ -36,7 +36,6 @@ const questionBank = [
   }
 ];
 
-// 隨機選 4 題
 function getRandomQuestions(arr, n) {
   const shuffled = arr.sort(() => 0.5 - Math.random());
   return shuffled.slice(0, n);
@@ -54,10 +53,6 @@ const scoreSpan = document.getElementById("score");
 const nextBtn = document.getElementById("nextBtn");
 const submitBtn = document.getElementById("submitBtn");
 
-// 音效
-const correctAudio = new Audio("correct.mp3");
-
-// 顯示題目
 function showQuestion() {
   const q = questions[current];
   qBox.textContent = `第 ${current + 1} 題：${q.question}`;
@@ -66,13 +61,19 @@ function showQuestion() {
   q.options.forEach((opt, i) => {
     const btn = document.createElement("button");
     btn.textContent = opt;
+    btn.classList.add("option-button");
     btn.onclick = () => {
       if (i === q.answer) {
         score++;
         scoreSpan.textContent = score;
-        correctAudio.play();
-        btn.classList.add("correct-flash");
+        btn.classList.add("correct-answer");
+        qBox.classList.add("correct-bg");
+
+        setTimeout(() => {
+          qBox.classList.remove("correct-bg");
+        }, 800);
       } else {
+        btn.classList.add("wrong-answer");
         alert("答錯了！");
       }
 
@@ -111,7 +112,6 @@ submitBtn.onclick = async () => {
   }
 };
 
-// 登入狀態監聽
 onAuthStateChanged(auth, (u) => {
   if (u) {
     user = u;
