@@ -19,7 +19,11 @@ let current = 0;
 let score = 0;
 let user = null;
 
-let qBox, oBox, scoreSpan, nextBtn, submitBtn;
+const qBox = document.getElementById("questionBox");
+const oBox = document.getElementById("optionsBox");
+const scoreSpan = document.getElementById("score");
+const nextBtn = document.getElementById("nextBtn");
+const submitBtn = document.getElementById("submitBtn");
 
 function showQuestion() {
   const q = questions[current];
@@ -43,48 +47,38 @@ function showQuestion() {
     oBox.appendChild(btn);
   });
   nextBtn.style.display = "none";
-  submitBtn.style.display = "none";
 }
+
+nextBtn.onclick = () => {
+  current++;
+  if (current < questions.length) {
+    showQuestion();
+  } else {
+    nextBtn.style.display = "none";
+    submitBtn.style.display = "inline";
+    qBox.textContent = "🎉 遊戲完成！請提交分數";
+    oBox.innerHTML = "";
+  }
+};
+
+submitBtn.onclick = async () => {
+  if (user) {
+    await addDoc(collection(db, "scores"), {
+      uid: user.uid,
+      name: user.displayName,
+      score: score,
+      time: new Date()
+    });
+    alert("分數已儲存！");
+  } else {
+    alert("未登入，無法儲存");
+  }
+};
 
 onAuthStateChanged(auth, (u) => {
   if (u) {
     user = u;
-
-    // 確保 DOM 元素抓取在登入確認後
-    qBox = document.getElementById("questionBox");
-    oBox = document.getElementById("optionsBox");
-    scoreSpan = document.getElementById("score");
-    nextBtn = document.getElementById("nextBtn");
-    submitBtn = document.getElementById("submitBtn");
-
     showQuestion();
-
-    nextBtn.onclick = () => {
-      current++;
-      if (current < questions.length) {
-        showQuestion();
-      } else {
-        nextBtn.style.display = "none";
-        submitBtn.style.display = "inline";
-        qBox.textContent = "🎉 遊戲完成！請提交分數";
-        oBox.innerHTML = "";
-      }
-    };
-
-    submitBtn.onclick = async () => {
-      if (user) {
-        await addDoc(collection(db, "scores"), {
-          uid: user.uid,
-          name: user.displayName,
-          score: score,
-          time: new Date()
-        });
-        alert("分數已儲存！");
-      } else {
-        alert("未登入，無法儲存");
-      }
-    };
-
   } else {
     window.location.href = "index.html";
   }
