@@ -29,4 +29,44 @@ button {
 button:hover {
   background-color: #7cb342;
 }
+.correct-answer {
+  animation: flashGreen 0.8s ease-out;
+  background-color: #4CAF50 !important;
+  color: white;
+}
+
+.wrong-answer {
+  background-color: #f44336 !important;
+  color: white;
+}
+
+.correct-bg {
+  animation: bgFlash 0.8s ease-out;
+}
+
+@keyframes flashGreen {
+  0% { transform: scale(1); background-color: #4CAF50; }
+  50% { transform: scale(1.1); background-color: #81C784; }
+  100% { transform: scale(1); background-color: #4CAF50; }
+}
+
+@keyframes bgFlash {
+  0% { background-color: white; }
+  50% { background-color: #D0F0C0; }
+  100% { background-color: white; }
+}
+
+.option-button {
+  padding: 10px 16px;
+  margin: 8px;
+  border: none;
+  border-radius: 8px;
+  background-color: #eee;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.option-button:hover {
+  background-color: #ddd;
+}
 
